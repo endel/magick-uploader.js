@@ -1,0 +1,6 @@
+[submodule "lib/vendor/FileReader"]
+	path = lib/vendor/FileReader
+	url = git://github.com/Jahdrien/FileReader.git
+[submodule "lib/vendor/swfobject"]
+	path = lib/vendor/swfobject
+	url = git://github.com/swfobject/swfobject.git
