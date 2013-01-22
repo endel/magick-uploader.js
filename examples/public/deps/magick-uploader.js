@@ -4,7 +4,7 @@
  * 
  * @copyright 2013 Endel Dreyer 
  * @license MIT
- * @build 1/21/2013
+ * @build 1/22/2013
  */
 
 (function(window, $, undefined) {
@@ -72,7 +72,9 @@
     this.ctx = this.canvas.getContext('2d');
     if (options.smooth) {
       this.ctx.webkitImageSmoothingEnabled = options.smooth;
-      this.ctx.msieImageSmoothingEnabled = options.smooth;
+      this.ctx.imageSmoothingEnabled = options.smooth;
+      this.ctx.mozImageSmoothingEnabled = options.smooth;
+      this.ctx.oImageSmoothingEnabled = options.smooth;
       delete options.smooth;
     }
     this.image = new Image();
@@ -116,22 +118,47 @@
   //
   // TODO: Basic ImageMagick resizing options
   //
-  // Ignore Aspect Ratio ('!')
-  // Only Shrink Larger ('>')
-  // Only Enlarge Smaller ('<')
-  // Fill Given Area ('^')
-  // Percentage Resize ('%')
   MagickProcessor.prototype.resize = function(param) {
     var width = this.image.width,
         height = this.image.height,
-        dimensions = param.split('x'),
-        destWidth = dimensions[0],
-        destHeight = dimensions[1],
-        operation = param.match(/[!\<>\^\%]?/);
+        dimensions = param.match(/(\d+)x(\d+)/),
+        destWidth = dimensions[1],
+        destHeight = dimensions[2],
+        operation = param.match(/[!\<>\^\%]?/)[0],
+        scaleX = 1, scaleY = 1;
 
     this.canvas.width = destWidth;
     this.canvas.height = destHeight;
-    this.ctx.scale(destWidth / width, destHeight / height );
+
+    console.log(operation == "^");
+
+    if (operation == "!") {
+      // Ignore Aspect Ratio ('!')
+      this.image.width = destWidth;
+      this.image.height = destHeight;
+
+    } else if (operation == "^") {
+      // Fill Given Area ('^')
+      scaleX = destWidth / this.image.width ;
+      scaleY = destHeight / this.image.height ;
+      console.log("Scale!", scaleX, scaleY);
+
+    } else if (operation == "<") {
+      // Only Enlarge Smaller ('<')
+
+    } else if (operation == ">") {
+      // Only Shrink Larger ('>')
+
+    } else if (operation == "%") {
+      // Percentage Resize ('%')
+
+    } else {
+    }
+
+    if (scaleX !== 1 && scaleY !== 1) {
+      this.ctx.scale(scaleX, scaleY);
+    }
+
     this.ctx.drawImage(this.image, 0, 0, this.image.width, this.image.height);
   };
 

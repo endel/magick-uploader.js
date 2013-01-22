@@ -1,7 +1,7 @@
 {
   "name": "magick-uploader.js",
   "title": "Magick Uploader",
-  "description": "Upload and resize your images with easy.",
+  "description": "Resize images on client-side before sending it to your server.",
   "version": "0.0.1pre",
   "homepage": "http://ocapi.github.com/magick-uploader.js",
   "author": {

@@ -19,7 +19,7 @@ get '/' do
     <script type="text/javascript" charset="utf-8">
       $(function() {
         var uploader = $('input[type=file]').MagickUploader({
-          resize: "200x200",
+          resize: "^200x200",
           debugMode: true
         });
       });
