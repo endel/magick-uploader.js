@@ -13,11 +13,9 @@ get '/' do
     <title>Magick Uploader</title>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 
-    <!--[if IE]>
-      <script type="text/javascript" src="deps/jquery.FileReader.js"></script>
-      <script type="text/javascript" src="deps/flashcanvas.js"></script>
-      <script type="text/javascript" src="deps/swfobject.js"></script>
-    <![endif]-->
+    <script type="text/javascript" src="deps/jquery.FileReader.js"></script>
+    <script type="text/javascript" src="deps/flashcanvas.js"></script>
+    <script type="text/javascript" src="deps/swfobject.js"></script>
 
     <script type="text/javascript" src="deps/magick-uploader.js"></script>
     <script type="text/javascript" charset="utf-8">
@@ -33,15 +31,14 @@ get '/' do
   </head>
   <body style="background: #000;">
     <form action="/" method="POST" enctype="multipart/form-data" >
-      <input type="file" name="upload1" id="upload" /> <br />
-      <!--
-      <input type="file" name="upload2" id="upload" /> <br />
-      <input type="file" name="upload3" id="upload" /> <br />
-      <input type="file" name="upload4" id="upload" /> <br />
-      -->
+      <input type="file" name="upload1" id="upload1" /> <br />
+      <input type="file" name="upload2" id="upload2" /> <br />
+      <input type="file" name="upload3" id="upload3" /> <br />
+      <input type="file" name="upload4" id="upload4" /> <br />
       <input type="submit" />
 
-      <span class="preview" style="border: 1px solid #fff;"></span>
+      <br />
+      <span class="preview" style="border: 1px solid #fff; display: inline-block;"></span>
     </form>
   </body>
 </html>
@@ -50,11 +47,19 @@ end
 
 post '/' do
   puts params.inspect
-  mime = params['upload1'].match(/data:([^;]*);/)[1]
-  image_data = Base64.decode64(params['upload1'].split(',')[1])
 
-  File.open("upload.#{mime.split('/')[1]}", "w+") do |f|
-    f.write(image_data)
+  mime = nil
+  image_data = nil
+
+  params.each do |param, data|
+    next if data.nil? || data.empty?
+
+    mime = data.match(/data:([^;]*);/)[1]
+    image_data = Base64.decode64(data.split(',')[1])
+
+    File.open("#{param}.#{mime.split('/')[1]}", "w+") do |f|
+      f.write(image_data)
+    end
   end
 
   content_type mime

@@ -36,9 +36,7 @@
 	*     adds an input to registry
 	*/
 	var main = function(el, options) {
-    console.log("Main!");
 		return el.each(function(i, input) {
-      console.log("Setup!", input);
 			input = $(input);
 			var id = input.attr('id');
 			if (!id) {
@@ -61,7 +59,7 @@
 						FileAPIProxy.container
 							.height(input.outerHeight())
 							.width(input.outerWidth())
-							.position({of:input});
+              .css(input.offset());
 					}
 				})
 				.click(function(e) {
@@ -148,7 +146,7 @@
 			if (this.debugMode) console.log(error);
 		},
 		onSWFReady: function() {
-                    this.container.css({position: 'absolute', display: 'block', border: '1px solid yellow'});
+                    this.container.css({position: 'absolute'});
                     this.ready = typeof this.swfObject.add === "function";
 			if (this.ready) {
 				readyCallbacks.fire();

@@ -1,5 +1,5 @@
 /* 
- * magick-uploader.js v0.0.1pre 
+ * magick-uploader.js v0.0.1 
  * http://ocapi.github.com/magick-uploader.js
  * 
  * @copyright 2013 Endel Dreyer 
@@ -7,10 +7,10 @@
  * @build 1/22/2013
  */
 
-(function(window, $, undefined) {
+(function(window, document, $, undefined) {
   /**
-   * MagickUploader
-   * --------------
+   * MagickUploader jQuery Plugin
+   * ----------------------------
    *
    * Avaible options
    * - resize (String)
@@ -50,10 +50,11 @@
       }
     });
 
-    var processorOptions = {};
-    $(['resize', 'smooth', 'preview']).each(function(i, option) {
+    // Processor options
+    $(['resize']).each(function(i, option) {
+      options.process = {}
       if (options[option]) {
-        processorOptions[option] = options[option];
+        options.process[option] = options[option];
       }
     });
 
@@ -61,10 +62,13 @@
       var elemName = $(elem).attr('name'),
           resultElem = $('<input name="' + elemName + '" type="hidden" />');
 
+      // Polyfill element id
+      fileReaderOptions['id'] = 'fileReaderPolyfill' + idx.toString();
+
       $(elem).after(resultElem);
       $(elem).on('change', function(evt){
         for (var i=0, length = evt.target.files.length; i<length; ++i) {
-          var processor = new MagickProcessor($.extend(processorOptions, {
+          var processor = new MagickProcessor($.extend(options, {
             result: resultElem
           }));
 
@@ -74,6 +78,10 @@
           };
           reader.readAsDataURL(evt.target.files[i]);
         }
+
+        // Remove and add input element again
+        // To prevent sending real files to the server.
+        $(this).before($(this).clone()).remove()
       });
 
       // Activate FileReader polyfill if it is defined.
@@ -86,12 +94,12 @@
   };
 
   /**
-   *
+   * @class MagickProcessor
+   * @constructor
    */
   var MagickProcessor = function(options) {
     this.options = options;
     this.canvas = this.createCanvas(options.preview);
-    delete options.preview;
 
     this.ctx = this.canvas.getContext('2d');
     this.image = new Image();
@@ -101,16 +109,13 @@
       this.ctx.imageSmoothingEnabled = options.smooth;
       this.ctx.mozImageSmoothingEnabled = options.smooth;
       this.ctx.oImageSmoothingEnabled = options.smooth;
-      delete options.smooth;
     }
 
     this.result = options.result;
-
-    delete options.result;
   };
 
   MagickProcessor.prototype.createCanvas = function (container) {
-    var canvas = window.document.createElement('canvas');
+    var canvas = document.createElement('canvas');
 
     console.log("Container!", container);
     if (container) {
@@ -128,8 +133,6 @@
   MagickProcessor.prototype.loadImage = function (dataUrl) {
     var self = this;
     this.image.onload = function() {
-      self.canvas.width = this.width;
-      self.canvas.height = this.height;
       self.process();
     };
     this.image.src = dataUrl;
@@ -137,13 +140,16 @@
 
   MagickProcessor.prototype.process = function () {
     var self = this;
-    $.each(this.options, function (method, args) {
-      if (!(args instanceof Array)) {
-        args = [args];
-      }
+
+    $.each(this.options.process, function (method, args) {
+      if (!(args instanceof Array)) { args = [args]; }
       self[method].apply(self, args);
     });
-    $(this.result).val(this.canvas.toDataURL());
+
+    // Don't call toDataURL() instantly due FlashCanvas delay
+    setInterval(function() {
+      $(self.result).val(self.canvas.toDataURL());
+    }, 10);
   };
 
   MagickProcessor.prototype.resizeCanvas = function(width, height) {
@@ -173,13 +179,11 @@
       scaleX = destWidth / this.image.width;
       scaleY = destHeight / this.image.height;
 
-      this.ctx.scale(scaleX, scaleY);
-
       destWidth = this.image.width;
       destHeight = this.image.height;
 
-      this.canvas.width = destWidth * scaleX;
-      this.canvas.height = destHeight * scaleY;
+      this.resizeCanvas(destWidth * scaleX, destHeight * scaleY);
+      this.ctx.scale(scaleX, scaleY);
 
       x = (this.canvas.width - destWidth) / 2;
       y = (this.canvas.height - destHeight) / 2;
@@ -189,13 +193,11 @@
       scaleX = destWidth / 100;
       scaleY = destHeight / 100;
 
-      this.ctx.scale(scaleX, scaleY);
-
       destWidth = this.image.width * scaleX;
       destHeight = this.image.height * scaleY;
 
-      this.canvas.width = destWidth;
-      this.canvas.height = destHeight;
+      this.resizeCanvas(destWidth, destHeight);
+      this.ctx.scale(scaleX, scaleY);
 
     } else if (operation == "<") {
       // Only Enlarge Smaller ('<')
@@ -210,7 +212,6 @@
       }
 
       this.resizeCanvas(destWidth, destHeight);
-
 
     } else if (operation == ">") {
       // Only Shrink Larger ('>')
@@ -242,4 +243,4 @@
     this.ctx.drawImage(this.image, x, y, destWidth, destHeight);
   };
 
-})(window, jQuery);
+})(this, this.document, jQuery);

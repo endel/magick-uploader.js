@@ -2,7 +2,7 @@
   "name": "magick-uploader.js",
   "title": "Magick Uploader",
   "description": "Resize images on client-side before sending it to your server.",
-  "version": "0.0.1pre",
+  "version": "0.0.1",
   "homepage": "http://ocapi.github.com/magick-uploader.js",
   "author": {
     "name": "Endel Dreyer",

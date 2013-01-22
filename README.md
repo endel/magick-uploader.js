@@ -6,6 +6,8 @@ FileAPI and Canvas features from your client browser, which may be polyfilled
 using Flash bridges, such as [flashcanvas](http://code.google.com/p/flashcanvas)
 and [FileReader](https://github.com/Jahdrien/FileReader).
 
+Check `examples` directory, run `bundle install` and `rackup` to see in action.
+
 How to use
 ---
 
@@ -13,7 +15,13 @@ How to use
       $('input[type=file]').MagickUploader({ resize: "200x200^" });
     });
 
-Browser compatibility (Native)
+TODO
+---
+
+Polyfill accourding to user's browser. Currently you must do it manually, using
+[Modernizr](https://github.com/Modernizr/Modernizr), or [yepnopejs](https://github.com/SlexAxton/yepnope.js).
+
+Browser compatibility
 ---
 
 Supported natively:
