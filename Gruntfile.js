@@ -11,7 +11,7 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     meta: {
-      name: "joy.js",
+      name: "magick-uploader.js",
       banner: '/* \n' +
         ' * <%= meta.name %> v<%= pkg.version %> \n' +
         ' * <%= pkg.homepage %>\n' +
@@ -25,12 +25,8 @@ module.exports = function(grunt) {
       options: {
         banner: '<%= meta.banner %>'
       },
-      dist: {
-        src: [
-          'lib/*.js'
-        ],
-        dest: 'dist/magick-uploader.js'
-      }
+      dist: { src: ['lib/*.js'], dest: 'dist/magick-uploader.js' },
+      example: {src: ['lib/*.js'], dest: 'examples/public/deps/magick-uploader.js'}
     },
     uglify: {
       exportAll: {
